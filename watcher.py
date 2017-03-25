@@ -1,24 +1,35 @@
 #!/usr/bin/python
 
 import urllib2
-import urllib
 from cookielib import CookieJar
 import os
 import sys
+import smtplib
 
-# Config
+# Config - don't touch
 URL = sys.argv[1]
-TOLERANCE = sys.argv[2] # in different characters
-TEMP_FILE = '/home/me/dev/temp.txt'
-SENDMAIL_PATH = "/usr/sbin/sendmail"
-SENDER_ADDRESS = 'root@yourserver.com'
-RECIPIENT_ADDRESS = 'you@yourserver.com'
-MAIL_SUBJECT = 'Something has changed...'
+TOLERANCE = int(sys.argv[2])  # in different characters
+USE_SMTP = bool(sys.argv[3])  # use SMTP or not (default is local sendmail)
+TEMP_FILE = '/tmp/watcher_cache.txt'
+
+# Config - adapt to your needs!
+SENDMAIL_PATH = '/usr/sbin/sendmail' # path to local sendmail binary, SMTP is not going to be used
+SENDER_ADDRESS = 'noreply@example.com' # what should be the sender address of the notification mail
+RECIPIENT_ADDRESS = 'you@example.com' # where to send the notification mail to
+MAIL_SUBJECT = 'Something has changed...' # subject line of the mail you'll receive
+SMTP_HOST = 'localhost' # SMTP server hostname or ip
+SMTP_PORT = 25 # SMTP server's port, usually 25
+SMTP_USERNAME = '' # username to authenticate against SMTP server; leave blank if no auth needed
+SMTP_PASSWORD = '' # password to authenticate against SMTP server; leave blank if no auth needed
+SMTP_STARTTLS = True # whether or not the SMTP server requires encrypted connection
 
 # Read length of old web page version
-f = open(TEMP_FILE, 'r')
-len1 = len(f.read())
-f.close()
+try:
+    f = open(TEMP_FILE, 'r')
+    len1 = len(f.read())
+    f.close()
+except:
+    len1 = 0
 
 # Read length of current web page version
 cj = CookieJar()
@@ -28,22 +39,40 @@ html = str(response.read())
 len2 = len(html)
 
 # Write new version to file
-f = open(TEMP_FILE, 'w')
+f = open(TEMP_FILE, 'w+')
 f.write(html)
 f.close()
 
-def sendMail(sender, recipient, subject, text):
-    sendmail_location = SENDMAIL_PATH
-    p = os.popen("%s -t" % sendmail_location, "w")
-    p.write("From: %s\n" % sender)
-    p.write("To: %s\n" % recipient)
-    p.write("Subject: %s\n" % subject)
-    p.write("\n") # blank line separating headers from body
-    p.write(text)
-    status = p.close()
-    if status != None:
-           print("Sendmail exit status", status)
+
+def send_mail(sender, recipient, subject, text):
+    msg = "From: %s\n" % sender
+    msg += "To: %s\n" % recipient
+    msg += "Subject: %s\n\n" % subject
+    msg += text
+
+    if not USE_SMTP:
+        sendmail_location = SENDMAIL_PATH
+        p = os.popen("%s -t" % sendmail_location, "w")
+        status = p.close()
+        if status != None:
+            print("Sendmail exit status", status)
+    else:
+        try:
+            smtp = smtplib.SMTP(SMTP_HOST, SMTP_PORT)
+            smtp.ehlo()
+            if SMTP_STARTTLS:
+                smtp.starttls()
+            smtp.ehlo()
+            if SMTP_USERNAME is not None and SMTP_USERNAME is not '':
+                smtp.login(SMTP_USERNAME, SMTP_PASSWORD)
+            smtp.sendmail(SENDER_ADDRESS, [RECIPIENT_ADDRESS], msg)
+            print("Successfully sent email")
+            smtp.close()
+        except smtplib.SMTPException as e:
+            print("Error: unable to send email: ", e)
+
 
 diff = abs(len2 - len1)
 if diff > TOLERANCE:
-        sendMail(SENDER_ADDRESS, RECIPIENT_ADDRESS, MAIL_SUBJECT, 'Difference is %s characters.\n%s' % (str(diff), URL))
+    send_mail(SENDER_ADDRESS, RECIPIENT_ADDRESS, MAIL_SUBJECT,
+              'Difference is %s characters.\n%s' % (str(diff), URL))

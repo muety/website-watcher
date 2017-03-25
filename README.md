@@ -11,14 +11,14 @@ In order to save memory and CPU time in idle (although only very few) the script
 ### Requirements
 * Linux based system
 * Python 2.7.x to be installed
-* Sendmail to be installed (usually by default)
+* __EITHER:__ sendmail to be installed
+* __OR:__ access to an SMTP server
 * Cron jobs
 
 ### Usage
 * Clone project: `git clone https://github.com/n1try/website-watcher-script` (Alternatively simply copy and paste the watcher.py)
-* Manually create empty file called temp.txt in the same location (you can change filename and location inside the script optionally) where your script lies: `touch temp.txt` (should have read- and write permissions for the user who will execute the script later)
-* Adjust sender- and recipient mail address constants, mail subject and sendmail path in the script
-* Create cronjob for your user account: `crontab -e` and add `@hourly python /path/to/script/watcher.py <url> <threshold>`, e.g. `@hourly python ~/dev/watcher.py http://google.com 5` for hourly visiting google.com and ignoring changes less than 6 characters 
+* Adjust constants in `watcher.py`, e.g. set the address and credential for your SMTP server, the path to local sendmail, the recipient email address etc.
+* Create cronjob for your user account: `crontab -e` and add `@hourly /path/to/script/watcher.py <url> <threshold> <use_smtp>`, e.g. `@hourly ~/dev/watcher.py http://google.com 5 true` for hourly visiting google.com, ignoring changes less than 6 characters and sending notification mail via SMTP
 
 ##### NOTE
 When running the script for the first time, you will get an e-mail that there where changes, since there is a difference between the empty file and the entire webiste HMTL code.
