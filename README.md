@@ -16,7 +16,8 @@ In order to save memory and CPU time in idle (although only very few) the script
 * Cron jobs
 
 ### Usage
-* Clone project: `git clone https://github.com/n1try/website-watcher-script` (Alternatively simply copy and paste the watcher.py)
+* Clone project: `git clone https://github.com/n1try/website-watcher-script`
+* `sudo pip install -r requirements.txt`
 * Adjust constants in `watcher.py`, e.g. set the address and credential for your SMTP server, the path to local sendmail, the recipient email address etc.
 * Create cronjob for your user account: `crontab -e` and add `@hourly /path/to/script/watcher.py <url> <threshold> <use_smtp>`, e.g. `@hourly ~/dev/watcher.py http://google.com 5 true` for hourly visiting google.com, ignoring changes less than 6 characters and sending notification mail via SMTP
 

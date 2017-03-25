@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
-import urllib2
-from cookielib import CookieJar
+import requests
 import os
 import sys
 import smtplib
@@ -9,7 +8,7 @@ import smtplib
 # Config - don't touch
 URL = sys.argv[1]
 TOLERANCE = int(sys.argv[2])  # in different characters
-USE_SMTP = bool(sys.argv[3])  # use SMTP or not (default is local sendmail)
+USE_SMTP = sys.argv[3] == 'true' or sys.argv[3] == 'True' or sys.argv[3] == '1' # use SMTP or not (default is local sendmail)
 TEMP_FILE = '/tmp/watcher_cache.txt'
 
 # Config - adapt to your needs!
@@ -32,17 +31,20 @@ except:
     len1 = 0
 
 # Read length of current web page version
-cj = CookieJar()
-opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-response = opener.open(URL)
-html = str(response.read())
-len2 = len(html)
+r = requests.get(URL)
+if r.status_code is not 200:
+    print('Could not fetch %s.' % URL)
+    len2 = 0
+else:
+    len2 = len(r.text)
 
 # Write new version to file
-f = open(TEMP_FILE, 'w+')
-f.write(html)
-f.close()
-
+try:
+    f = open(TEMP_FILE, 'w')
+    f.write(r.text.encode('utf8'))
+    f.close()
+except Exception as e:
+    print('Could not open file %s: %s' % (TEMP_FILE, e))
 
 def send_mail(sender, recipient, subject, text):
     msg = "From: %s\n" % sender
