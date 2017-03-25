@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import urllib2
 import urllib
 from cookielib import CookieJar
@@ -5,8 +7,8 @@ import os
 import sys
 
 # Config
-URL = sys.argv[0]
-TOLERANCE = sys.argv[1] # in different characters
+URL = sys.argv[1]
+TOLERANCE = sys.argv[2] # in different characters
 TEMP_FILE = '/home/me/dev/temp.txt'
 SENDMAIL_PATH = "/usr/sbin/sendmail"
 SENDER_ADDRESS = 'root@yourserver.com'
