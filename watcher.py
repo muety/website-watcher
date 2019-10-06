@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import argparse
 import requests
 import os
@@ -66,16 +66,16 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', '--url', required=True, type=str, help='URL to watch')
-    parser.add_argument('-t', '--tolerance', default=0, type=int, help='Number of characters which have to differ from the cached and new version to send a notification')
-    parser.add_argument('--smtp', action='store_true', help='If set, SMTP is used.')
-    parser.add_argument('--sendmail_path', default='/usr/sbin/sendmail', type=str, help='Path to sendmail binary')
-    parser.add_argument('--tmp_file', default='/tmp/watcher_cache.txt', type=str, help='path to temporary file which is used for caching and comparison')
-    parser.add_argument('--sender_address', default='noreply@example.com', type=str, help='E-mail address of the sender of the mail')
-    parser.add_argument('--recipient_address', required=True, type=str, help='E-mail address of the receiver of the mail')
-    parser.add_argument('--subject', default='Something has changed', type=str, help='Subject of the mail')
-    parser.add_argument('--smtp_host', default='localhost', type=str, help='Address of the SMTP mail server which is used to send the mail')
-    parser.add_argument('--smtp_port', default=25, type=int, help='SMTP port of the mailserver')
-    parser.add_argument('--smtp_username', default='', type=str, help='SMTP login username')
-    parser.add_argument('--smtp_password', default='', type=str, help='SMTP login password')
-    parser.add_argument('--disable_tls', action='store_false', help='If set, TLS is disables')
+    parser.add_argument('-s', '--sender_address', default='noreply@example.com', type=str, help='Sender e-mail address')
+    parser.add_argument('-r', '--recipient_address', required=True, type=str, help='Receiver e-mail address')
+    parser.add_argument('--subject', default='Something has changed', type=str, help='E-Mail subject')
+    parser.add_argument('-t', '--tolerance', default=0, type=int, help='Number of characters which have to differ between cached- and new content to trigger a notification')
+    parser.add_argument('--sendmail_path', default='/usr/sbin/sendmail', type=str, help='Path to Sendmail binary')
+    parser.add_argument('--smtp', action='store_true', help='If set, SMTP is used instead of local Sendmail.')
+    parser.add_argument('--smtp_host', default='localhost', type=str, help='SMTP server host name to send mails with – only required of "--smtp" is set to true')
+    parser.add_argument('--smtp_port', default=25, type=int, help='SMTP server port – only required of "--smtp" is set to true')
+    parser.add_argument('--smtp_username', default='', type=str, help='SMTP server login username – only required of "--smtp" is set to true')
+    parser.add_argument('--smtp_password', default='', type=str, help='SMTP server login password – only required of "--smtp" is set to true')
+    parser.add_argument('--disable_tls', action='store_false', help='If set, SMTP connection is unencrypted (TLS disabled) – only required of "--smtp" is set to true')
+    parser.add_argument('--tmp_file', default='/tmp/watcher_cache.txt', type=str, help='Path to temporary file to be used for caching and comparison')
     main(parser.parse_args())
