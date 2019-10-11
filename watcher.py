@@ -17,7 +17,7 @@ def filter_documemt(nodes):
     text = ""
     for element in nodes:
         text = text + element.text_content()
-    return text.replace(" ", "")
+    return text
 
 def send_mail(text, args):
     msg = 'From: %s\n' % args.sender_address
