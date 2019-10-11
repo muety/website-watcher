@@ -4,6 +4,12 @@ import requests
 import os
 import smtplib
 import sys
+from lxml import html
+
+def getNodes(args, page):
+    exp = args.xpath
+    tree = html.fromstring(page)
+    return tree.xpath(exp)
 
 
 def send_mail(text, args):
@@ -38,7 +44,8 @@ def main(args):
     # Read length of old web page version
     try:
         with open(args.tmp_file, 'r') as f:
-            len1 = len(f.read())
+            len1 = len( getNodes(args, f.read().encode("utf-8")) )
+            print(len1)
     except:
         len1 = 0
 
@@ -49,7 +56,8 @@ def main(args):
         print('Could not fetch %s.' % args.url)
         len2 = 0
     else:
-        len2 = len(r.text)
+        len2 = len( getNodes(args, r.text.encode("utf-8")) )
+        print(len2)
 
     # Write new version to file
     try:
@@ -77,5 +85,10 @@ if __name__ == '__main__':
     parser.add_argument('--smtp_username', default='', type=str, help='SMTP server login username – only required of "--smtp" is set to true')
     parser.add_argument('--smtp_password', default='', type=str, help='SMTP server login password – only required of "--smtp" is set to true')
     parser.add_argument('--disable_tls', action='store_false', help='If set, SMTP connection is unencrypted (TLS disabled) – only required of "--smtp" is set to true')
-    parser.add_argument('--tmp_file', default='/tmp/watcher_cache.txt', type=str, help='Path to temporary file to be used for caching and comparison')
-    main(parser.parse_args())
+    parser.add_argument('--tmp_file', default='watcher_cache.txt', type=str, help='Path to temporary file to be used for caching and comparison')
+    parser.add_argument('-x', '--xpath', default='//node()', type=str, help="XPath expression designating the elements to watch")
+    p = parser.parse_args()
+    with open(p.tmp_file, 'w') as f:
+        f.write(requests.get(p.url).text)
+        f.close()
+    main(p)
