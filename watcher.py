@@ -4,13 +4,20 @@ import requests
 import os
 import smtplib
 import sys
+import tempfile
 from lxml import html
 
-def getNodes(args, page):
-    exp = args.xpath
+def get_nodes(exp, page):
+    """ Returns lxml nodes corresponding to the XPath expression """
     tree = html.fromstring(page)
     return tree.xpath(exp)
 
+def filter_documemt(nodes):
+    """ Returns the text content of the specified nodes """
+    text = ""
+    for element in nodes:
+        text = text + element.text_content()
+    return text.replace(" ", "")
 
 def send_mail(text, args):
     msg = 'From: %s\n' % args.sender_address
@@ -44,7 +51,7 @@ def main(args):
     # Read length of old web page version
     try:
         with open(args.tmp_file, 'r') as f:
-            len1 = len( getNodes(args, f.read().encode("utf-8")) )
+            len1 = len( filter_documemt( get_nodes( args.xpath, f.read().encode("utf-8") ) ) )
     except:
         len1 = 0
 
@@ -55,7 +62,7 @@ def main(args):
         print('Could not fetch %s.' % args.url)
         len2 = 0
     else:
-        len2 = len( getNodes(args, r.text.encode("utf-8")) )
+        len2 = len( filter_documemt( get_nodes( args.xpath, r.text.encode("utf-8") ) ) )
 
     # Write new version to file
     try:
@@ -70,6 +77,10 @@ def main(args):
 
 
 if __name__ == '__main__':
+
+    tmp_dir = tempfile.gettempdir()
+    tmp_location = tmp_dir+"/watcher_cache.txt"
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', '--url', required=True, type=str, help='URL to watch')
     parser.add_argument('-s', '--sender_address', default='noreply@example.com', type=str, help='Sender e-mail address')
@@ -83,6 +94,6 @@ if __name__ == '__main__':
     parser.add_argument('--smtp_username', default='', type=str, help='SMTP server login username – only required of "--smtp" is set to true')
     parser.add_argument('--smtp_password', default='', type=str, help='SMTP server login password – only required of "--smtp" is set to true')
     parser.add_argument('--disable_tls', action='store_false', help='If set, SMTP connection is unencrypted (TLS disabled) – only required of "--smtp" is set to true')
-    parser.add_argument('--tmp_file', default='watcher_cache.txt', type=str, help='Path to temporary file to be used for caching and comparison')
-    parser.add_argument('-x', '--xpath', default='//node()', type=str, help="XPath expression designating the elements to watch")
+    parser.add_argument('--tmp_file', default=tmp_location, type=str, help='Path to temporary file to be used for caching and comparison')
+    parser.add_argument('-x', '--xpath', default='//*', type=str, help="XPath expression designating the elements to watch")
     main(parser.parse_args())
