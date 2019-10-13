@@ -95,5 +95,5 @@ if __name__ == '__main__':
     parser.add_argument('--smtp_password', default='', type=str, help='SMTP server login password – only required of "--smtp" is set to true')
     parser.add_argument('--disable_tls', action='store_false', help='If set, SMTP connection is unencrypted (TLS disabled) – only required of "--smtp" is set to true')
     parser.add_argument('--tmp_file', default=tmp_location, type=str, help='Path to temporary file to be used for caching and comparison')
-    parser.add_argument('-x', '--xpath', default='//*', type=str, help="XPath expression designating the elements to watch")
+    parser.add_argument('-x', '--xpath', default='//body', type=str, help="XPath expression designating the elements to watch")
     main(parser.parse_args())
