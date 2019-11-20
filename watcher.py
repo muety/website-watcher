@@ -5,6 +5,7 @@ import os
 import smtplib
 import sys
 import tempfile
+import hashlib
 from lxml import html
 
 def get_nodes(exp, page):
@@ -46,11 +47,18 @@ def send_mail(text, args):
         except smtplib.SMTPException as e:
             print('Error: unable to send email: ', e)
 
+def get_tmp_file(url):
+    tmp_dir = tempfile.gettempdir()
+    m = hashlib.md5()
+    m.update(url.encode('utf-8'))
+    return os.path.join(tmp_dir, f'{m.hexdigest()[:6]}_cache.txt')
 
 def main(args):
+    tmp_location = get_tmp_file(args.url)
+
     # Read length of old web page version
     try:
-        with open(args.tmp_file, 'r') as f:
+        with open(tmp_location, 'r') as f:
             len1 = len(filter_document(get_nodes(args.xpath, f.read().encode("utf-8"))))
     except:
         len1 = 0
@@ -66,10 +74,10 @@ def main(args):
 
     # Write new version to file
     try:
-        with open(args.tmp_file, 'w') as f:
+        with open(tmp_location, 'w') as f:
             f.write(r.text)
     except Exception as e:
-        print('Could not open file %s: %s' % (args.tmp_file, e))
+        print('Could not open file %s: %s' % (tmp_location, e))
 
     diff = abs(len2 - len1)
     if diff > args.tolerance:
@@ -77,16 +85,14 @@ def main(args):
 
 
 if __name__ == '__main__':
-
-    tmp_dir = tempfile.gettempdir()
-    tmp_location = tmp_dir+"/watcher_cache.txt"
-
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', '--url', required=True, type=str, help='URL to watch')
     parser.add_argument('-s', '--sender_address', default='noreply@example.com', type=str, help='Sender e-mail address')
     parser.add_argument('-r', '--recipient_address', required=True, type=str, help='Receiver e-mail address')
+    parser.add_argument('-t', '--tolerance', default=0, type=int, help='Number of characters which have to differ between cached- and new content to trigger a 
+    parser.add_argument('-x', '--xpath', default='//body', type=str, help="XPath expression designating the elements to watch")
     parser.add_argument('--subject', default='Something has changed', type=str, help='E-Mail subject')
-    parser.add_argument('-t', '--tolerance', default=0, type=int, help='Number of characters which have to differ between cached- and new content to trigger a notification')
+    notification')
     parser.add_argument('--sendmail_path', default='/usr/sbin/sendmail', type=str, help='Path to Sendmail binary')
     parser.add_argument('--smtp', action='store_true', help='If set, SMTP is used instead of local Sendmail.')
     parser.add_argument('--smtp_host', default='localhost', type=str, help='SMTP server host name to send mails with – only required of "--smtp" is set to true')
@@ -94,6 +100,4 @@ if __name__ == '__main__':
     parser.add_argument('--smtp_username', default='', type=str, help='SMTP server login username – only required of "--smtp" is set to true')
     parser.add_argument('--smtp_password', default='', type=str, help='SMTP server login password – only required of "--smtp" is set to true')
     parser.add_argument('--disable_tls', action='store_false', help='If set, SMTP connection is unencrypted (TLS disabled) – only required of "--smtp" is set to true')
-    parser.add_argument('--tmp_file', default=tmp_location, type=str, help='Path to temporary file to be used for caching and comparison')
-    parser.add_argument('-x', '--xpath', default='//body', type=str, help="XPath expression designating the elements to watch")
     main(parser.parse_args())
