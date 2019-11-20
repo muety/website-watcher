@@ -51,7 +51,7 @@ def main(args):
     # Read length of old web page version
     try:
         with open(args.tmp_file, 'r') as f:
-            len1 = len( filter_documemt(get_nodes(args.xpath, f.read().encode("utf-8"))))
+            len1 = len(filter_document(get_nodes(args.xpath, f.read().encode("utf-8"))))
     except:
         len1 = 0
 
@@ -62,7 +62,7 @@ def main(args):
         print('Could not fetch %s.' % args.url)
         len2 = 0
     else:
-        len2 = len( filter_documemt(get_nodes(args.xpath, r.text.encode("utf-8"))))
+        len2 = len(filter_document(get_nodes(args.xpath, r.text.encode("utf-8"))))
 
     # Write new version to file
     try:
