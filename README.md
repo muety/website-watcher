@@ -22,6 +22,9 @@ In order to save memory and CPU time in idle (although only very few) the script
 * Create cronjob for your user account with `crontab -e` and add – for instance – `@hourly ~/dev/watcher.py -u https://kit.edu -t 5 --adapter email -r ferdinand@muetsch.io`. This will hourly visit kit.edu and send an e-mail in case of changes, while ignoring changes less than 6 characters.
 * See `python3 watcher.py -h` for information on all available parameters.
 
+### 👀 Please note
+When running the script for the first time, you will get an e-mail that there where changes, since there is a difference between the empty file and the entire webiste HMTL code.
+
 ## 🔌 Adapters
 Multiple **send methods** are supported in the form of _adapters_. To choose one, supply `--adapter` (e.g. `--adapter email`) as a an argument to `watcher.py`
 
@@ -55,9 +58,6 @@ You have to register for the bot first to get an token. To do so, send a message
   -s SENDER,                    – Sender name
   --middleman_url MIDDLEMAN_URL – URL of the Telegram Middleman bot instance
 ```
-
-### 👀 Please note
-When running the script for the first time, you will get an e-mail that there where changes, since there is a difference between the empty file and the entire webiste HMTL code.
 
 ## 👩‍💻 Contributing
 Feel free to contribute! All contributions that add value to the project are welcome. Please check the issues section for bug reports and feature requests.
