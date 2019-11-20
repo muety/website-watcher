@@ -12,18 +12,49 @@ In order to save memory and CPU time in idle (although only very few) the script
 
 ## ⚙️ Requirements
 * Python 3.6 
-* A mail server
-  * Option 1: sendmail to be installed
-  * Option 2: access to an SMTP server
 * Cron jobs
   * Or something like [schtasks](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc748993(v=ws.11)?redirectedfrom=MSDN) on Windows
 
 ## ▶️ Usage
 * Clone project: `git clone https://github.com/n1try/website-watcher-script`
 * `sudo pip3 install -r requirements.txt`
-* Adjust constants in `watcher.py`, e.g. set the address and credential for your SMTP server, the path to local sendmail, the recipient email address etc.
 * `chmod +x watcher.py`
-* Create cronjob for your user account: `crontab -e` and add – for instance – `@hourly ~/dev/watcher.py -u https://kit.edu -t 5 -r ferdinand@muetsch.io` for hourly visiting kit.edu and ignoring changes less than 6 characters. See `python3 watcher.py -h` for information on all available parameters.
+* Create cronjob for your user account with `crontab -e` and add – for instance – `@hourly ~/dev/watcher.py -u https://kit.edu -t 5 --adapter email -r ferdinand@muetsch.io`. This will hourly visit kit.edu and send an e-mail in case of changes, while ignoring changes less than 6 characters.
+* See `python3 watcher.py -h` for information on all available parameters.
+
+## 🔌 Adapters
+Multiple **send methods** are supported in the form of _adapters_. To choose one, supply `--adapter` (e.g. `--adapter email`) as a an argument to `watcher.py`
+
+To write your **own adapter**, you need to implement abstract `SendAdapter` class. See [adapters/email.py](adapters/email.py) for an example.
+
+### E-Mail (`email`)
+This adapter, which is also the default one, will send an e-mail to notify about changes. It either uses local _sendmail_ or a specified SMTP server.
+
+#### Options
+```
+  -r RECIPIENT_ADDRESS          – Recipient e-mail address (required)
+  -s SENDER_ADDRESS             – Sender e-mail address
+  --subject SUBJECT             – E-Mail subject
+  --sendmail_path SENDMAIL_PATH – Path to Sendmail binary
+  --smtp                        – If set, SMTP is used instead of local Sendmail.
+  --smtp_host SMTP_HOST         – SMTP server host name to send mails with – only required of "--smtp" is set to true
+  --smtp_port SMTP_PORT         – SMTP server port – only required of "--smtp" is set to true
+  --smtp_username SMTP_USERNAME – SMTP server login username – only required of "--smtp" is set to true
+  --smtp_password SMTP_PASSWORD – SMTP server login password – only required of "--smtp" is set to true
+  --disable_tls                 – If set, SMTP connection is unencrypted (TLS disabled) – only required of "--smtp" is set to true
+
+```
+
+### Telegram Middleman Bot (`middleman`)
+This adapter will send an push notification via [Telegram](https://telegram.org) using the [Middleman Bot](https://github.com/n1try/telegram-middleman-bot).
+You have to register for the bot first to get an token. To do so, send a message to [@MiddlemanBot](https://t.me/@MiddlemanBot).
+
+#### Options
+```
+  -r RECIPIENT_TOKEN            – Recipient token (required)
+  -s SENDER,                    – Sender name
+  --middleman_url MIDDLEMAN_URL – URL of the Telegram Middleman bot instance
+```
 
 ### 👀 Please note
 When running the script for the first time, you will get an e-mail that there where changes, since there is a difference between the empty file and the entire webiste HMTL code.

@@ -1,17 +1,21 @@
 #!/usr/bin/python3
 import argparse
-import requests
+import hashlib
 import os
-import smtplib
 import sys
 import tempfile
-import hashlib
+
+import requests
 from lxml import html
+
+from adapters import SendAdapterFactory
+
 
 def get_nodes(exp, page):
     """ Returns lxml nodes corresponding to the XPath expression """
     tree = html.fromstring(page)
     return tree.xpath(exp)
+
 
 def filter_document(nodes):
     """ Returns the text content of the specified nodes """
@@ -20,32 +24,6 @@ def filter_document(nodes):
         text = text + element.text_content()
     return text
 
-def send_mail(text, args):
-    msg = 'From: %s\n' % args.sender_address
-    msg += 'To: %s\n' % args.recipient_address
-    msg += 'Subject: %s\n\n' % args.subject
-    msg += text
-
-    if not args.smtp:
-        sendmail_location = args.sendmail_path
-        p = os.popen('%s -t' % sendmail_location, 'w')
-        status = p.close()
-        if status != None:
-            print('Sendmail exit status', status)
-    else:
-        try:
-            smtp = smtplib.SMTP(args.smtp_host, args.smtp_port)
-            smtp.ehlo()
-            if not args.disable_tls:
-                smtp.starttls()
-            smtp.ehlo()
-            if args.smtp_username is not None and args.smtp_username is not '':
-                smtp.login(args.smtp_username, args.smtp_password)
-            smtp.sendmail(args.sender_address, [args.recipient_address], msg)
-            print('Successfully sent email')
-            smtp.close()
-        except smtplib.SMTPException as e:
-            print('Error: unable to send email: ', e)
 
 def get_tmp_file(url):
     tmp_dir = tempfile.gettempdir()
@@ -53,8 +31,14 @@ def get_tmp_file(url):
     m.update(url.encode('utf-8'))
     return os.path.join(tmp_dir, f'{m.hexdigest()[:6]}_cache.txt')
 
-def main(args):
+
+def main(args, remaining_args):
     tmp_location = get_tmp_file(args.url)
+
+    try:
+        adapter = SendAdapterFactory.get(args.adapter, remaining_args)
+    except AttributeError:
+        sys.exit(1)
 
     # Read length of old web page version
     try:
@@ -81,23 +65,26 @@ def main(args):
 
     diff = abs(len2 - len1)
     if diff > args.tolerance:
-        send_mail('Difference is %s characters.\n%s' % (str(diff), args.url), args)
+        ok = adapter.send('Difference is %s characters.\n%s' % (str(diff), args.url))
+        if not ok:
+            sys.exit(1)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    if len(sys.argv) >= 3 and sys.argv[1] == 'help':
+        adapter_class = SendAdapterFactory.get_class(sys.argv[2])
+        if adapter_class is None:
+            sys.exit(1)
+        else:
+            adapter_class.adapter.get_parser().print_help()
+            sys.exit(0)
+
+    parser = argparse.ArgumentParser(prog='Website Watcher')
     parser.add_argument('-u', '--url', required=True, type=str, help='URL to watch')
-    parser.add_argument('-s', '--sender_address', default='noreply@example.com', type=str, help='Sender e-mail address')
-    parser.add_argument('-r', '--recipient_address', required=True, type=str, help='Receiver e-mail address')
-    parser.add_argument('-t', '--tolerance', default=0, type=int, help='Number of characters which have to differ between cached- and new content to trigger a 
+    parser.add_argument('-t', '--tolerance', default=0, type=int, help='Number of characters which have to differ between cached- and new content to trigger a notification')
     parser.add_argument('-x', '--xpath', default='//body', type=str, help="XPath expression designating the elements to watch")
-    parser.add_argument('--subject', default='Something has changed', type=str, help='E-Mail subject')
-    notification')
-    parser.add_argument('--sendmail_path', default='/usr/sbin/sendmail', type=str, help='Path to Sendmail binary')
-    parser.add_argument('--smtp', action='store_true', help='If set, SMTP is used instead of local Sendmail.')
-    parser.add_argument('--smtp_host', default='localhost', type=str, help='SMTP server host name to send mails with – only required of "--smtp" is set to true')
-    parser.add_argument('--smtp_port', default=25, type=int, help='SMTP server port – only required of "--smtp" is set to true')
-    parser.add_argument('--smtp_username', default='', type=str, help='SMTP server login username – only required of "--smtp" is set to true')
-    parser.add_argument('--smtp_password', default='', type=str, help='SMTP server login password – only required of "--smtp" is set to true')
-    parser.add_argument('--disable_tls', action='store_false', help='If set, SMTP connection is unencrypted (TLS disabled) – only required of "--smtp" is set to true')
-    main(parser.parse_args())
+    parser.add_argument('--adapter', default='email', type=str, help='Send method to use. See "adapters" for all available')
+
+    args, remaining_args = parser.parse_known_args()
+
+    main(*parser.parse_known_args())
