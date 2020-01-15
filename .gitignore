@@ -1,3 +1,4 @@
 .vscode
 .idea
 temp.txt
+__pycache__

@@ -28,7 +28,7 @@ class MiddlemanSendAdapter(SendAdapter):
         parser = argparse.ArgumentParser(prog=f'Website Watcher – "{cls.get_name()}" Adapter', description=cls.get_description())
         parser.add_argument('-r', '--recipient_token', required=True, type=cls._valid_token, help='Recipient token')
         parser.add_argument('-s', '--sender', default='Website Watcher Script', type=str, help='Sender name')
-        parser.add_argument('--middleman_url', default='https://apps.muetsch.io/middleman', type=str, help='URL of the Telegram Middleman bot instance')
+        parser.add_argument('--middleman_url', default='https://apps.muetsch.io/middleman', type=cls._valid_url, help='URL of the Telegram Middleman bot instance')
         return parser
 
     @classmethod

@@ -55,9 +55,20 @@ You have to register for the bot first to get an token. To do so, send a message
 #### Options
 ```
   -r RECIPIENT_TOKEN            – Recipient token (required)
-  -s SENDER,                    – Sender name
+  -s SENDER                     – Sender name
   --middleman_url MIDDLEMAN_URL – URL of the Telegram Middleman bot instance
 ```
+
+### Gotify (`gotify`)
+This adapter will send an push notification via [Gotify](https://gotify.net).
+First, you have to register a new app in Gotify and gets its key as an authorization token.
+
+#### Options
+```
+  --gotify_key GOTIFY_KEY       – Gotify app key / token
+  --gotify_url GOTIFY_URL       – Gotify server instance address
+```
+
 
 ## 👩‍💻 Contributing
 Feel free to contribute! All contributions that add value to the project are welcome. Please check the issues section for bug reports and feature requests.
