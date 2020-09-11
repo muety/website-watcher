@@ -1,4 +1,4 @@
-# 🕵️‍♀️ website-watcher-script
+# 🕵️‍♀️ website-watcher
 
 ## 🗒 Summary
 This script watches a website, saves its contents to a specified text file, compares this file's contents to the website contents at the next visit and sends an e-mail if there are differences.
@@ -21,6 +21,12 @@ In order to save memory and CPU time in idle (although only very few) the script
 * `chmod +x watcher.py`
 * Create cronjob for your user account with `crontab -e` and add – for instance – `@hourly ~/dev/watcher.py -u https://kit.edu -t 5 --adapter email -r ferdinand@muetsch.io`. This will hourly visit kit.edu and send an e-mail in case of changes, while ignoring changes less than 6 characters.
 * See `python3 watcher.py -h` for information on all available parameters.
+
+### Options
+* `-u URL` (`required`): URL of the website to watch
+* `-t TOLERANCE`: Tolerance in characters, i.e. changes with a difference of less than or equal to `TOLERANCE` characters will be ignored and not trigger a notification
+* `-x XPATH`: An [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) query to restrict watching to certain parts of a website. Only child elements of the element matching the query will be considered while watching
+* `--adapter ADAPTER`: Which sending adapter to use (see below)
 
 ### 👀 Please note
 When running the script for the first time, you will get an e-mail that there where changes, since there is a difference between the empty file and the entire webiste HMTL code.
