@@ -25,9 +25,9 @@ class SendAdapter(ABC):
 
         try:
             return parser.parse_args(args)
-        except SystemExit:
+        except SystemExit as e:
             logging.info(f'For addition help try running "python watcher.py help {self.get_name()}"')
-            raise AttributeError('missing required arguments')
+            raise e
 
     @abstractmethod
     def send(self, text):

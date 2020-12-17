@@ -24,7 +24,7 @@ class EmailSendAdapter(SendAdapter):
             p = os.popen('%s -t' % sendmail_location, 'w')
             status = p.close()
             if status is not None:
-                logging.error('Sendmail exit status', status)
+                logging.error(f'Sendmail exit status {status}')
                 return False
             return True
         else:
@@ -40,7 +40,7 @@ class EmailSendAdapter(SendAdapter):
                 smtp.quit()
                 return True
             except smtplib.SMTPException as e:
-                logging.error('Error: unable to send email: ', e)
+                logging.error(f'Error: unable to send email: {e}')
                 return False
 
     @classmethod

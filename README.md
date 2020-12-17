@@ -1,5 +1,16 @@
 # 🕵️‍♀️ website-watcher
 
+![License](https://badges.fw-web.space/github/license/muety/website-watcher)
+![Coding Activity](https://badges.fw-web.space/endpoint?url=https://wakapi.dev/api/compat/shields/v1/n1try/interval:any/project:website-watcher-script&color=blue)
+![GitHub code size in bytes](https://badges.fw-web.space/github/languages/code-size/muety/website-watcher)
+![GitHub issues](https://badges.fw-web.space/github/issues/muety/website-watcher)
+![GitHub last commit](https://badges.fw-web.space/github/last-commit/muety/website-watcher)
+[![Say thanks](https://badges.fw-web.space/badge/SayThanks.io-%E2%98%BC-1EAEDB.svg)](https://saythanks.io/to/n1try)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=muety_website-watcher&metric=security_rating)](https://sonarcloud.io/dashboard?id=muety_website-watcher)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=muety_website-watcher&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=muety_website-watcher)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=muety_website-watcher&metric=sqale_index)](https://sonarcloud.io/dashboard?id=muety_website-watcher)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=muety_website-watcher&metric=ncloc)](https://sonarcloud.io/dashboard?id=muety_website-watcher)
+
 ## 🗒 Summary
 This script watches a website, saves its contents to a specified text file, compares this file's contents to the website contents at the next visit and sends an e-mail if there are differences.
 
@@ -11,7 +22,8 @@ The script is very simple and works in a way that it visits a website, saves the
 In order to save memory and CPU time in idle (although only very few) the script itself will only run once when executing it and instantly exit after it has finished one website visit. To make it run repeatedly you will have to set up a cron job that simply execute the script.
 
 ## ⚙️ Requirements
-* Python 3.6 
+* Python >= 3.6
+  * Currently not working with Python 3.9
 * Cron jobs
   * Or something like [schtasks](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc748993(v=ws.11)?redirectedfrom=MSDN) on Windows
 
@@ -54,15 +66,15 @@ This adapter, which is also the default one, will send an e-mail to notify about
 
 ```
 
-### Telegram Middleman Bot (`middleman`)
-This adapter will send an push notification via [Telegram](https://telegram.org) using the [Middleman Bot](https://github.com/n1try/telegram-middleman-bot).
-You have to register for the bot first to get an token. To do so, send a message to [@MiddlemanBot](https://t.me/@MiddlemanBot).
+### Webhook2Telegram (`webhook2telegram`)
+This adapter will send an push notification via [Telegram](https://telegram.org) using [Webhook2Telegram](https://github.com/muety/webhook2telegram).
+You have to register for the bot first to get an token. To do so, send a message to [@MiddlemanBot](https://t.me/@MiddlemanBot) (Webhook2Telegram was formerly called MiddlemanBot).
 
 #### Options
 ```
   -r RECIPIENT_TOKEN            – Recipient token (required)
   -s SENDER                     – Sender name
-  --middleman_url MIDDLEMAN_URL – URL of the Telegram Middleman bot instance
+  --webhook_url WEBHOOK_URL     – URL of the Webhook2Telegram bot instance
 ```
 
 ### Gotify (`gotify`)

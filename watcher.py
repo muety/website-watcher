@@ -50,7 +50,7 @@ def main(args, remaining_args):
     # Read length of current web page version
     # 301 and 302 redirections are resolved automatically
     r = requests.get(args.url)
-    if r.status_code is not 200:
+    if r.status_code != 200:
         print('Could not fetch %s.' % args.url)
         len2 = 0
     else:
