@@ -1,7 +1,7 @@
 # 🕵️‍♀️ website-watcher
 
 ![License](https://badges.fw-web.space/github/license/muety/website-watcher)
-![Coding Activity](https://badges.fw-web.space/endpoint?url=https://wakapi.dev/api/compat/shields/v1/n1try/interval:any/project:website-watcher-script&color=blue)
+![Coding Activity](https://badges.fw-web.space/endpoint?url=https://wakapi.dev/api/compat/shields/v1/n1try/interval:any/project:website-watcher&color=blue)
 ![GitHub code size in bytes](https://badges.fw-web.space/github/languages/code-size/muety/website-watcher)
 ![GitHub issues](https://badges.fw-web.space/github/issues/muety/website-watcher)
 ![GitHub last commit](https://badges.fw-web.space/github/last-commit/muety/website-watcher)
