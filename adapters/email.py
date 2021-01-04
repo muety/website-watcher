@@ -13,7 +13,7 @@ class EmailSendAdapter(SendAdapter):
     def __init__(self, args):
         self.args = self._parse_args(args)
 
-    def send(self, text):
+    def send(self, text, subject_url):
         msg = 'From: %s\n' % self.args.sender_address
         msg += 'To: %s\n' % self.args.recipient_address
         msg += 'Subject: %s\n\n' % self.args.subject

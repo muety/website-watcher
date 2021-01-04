@@ -30,7 +30,7 @@ class SendAdapter(ABC):
             raise e
 
     @abstractmethod
-    def send(self, text):
+    def send(self, text, subject_url):
         pass
 
     @classmethod

@@ -15,10 +15,10 @@ class Webhook2TelegramSendAdapter(SendAdapter):
     def __init__(self, args):
         self.args = self._parse_args(args)
 
-    def send(self, text):
+    def send(self, text, subject_url):
         url = f'{self.args.webhook_url}/api/messages'
         r = requests.post(url, json={'recipient_token': self.args.recipient_token, 'origin': self.args.sender, 'text': text})
-        if not r.status_code in range(200, 299):
+        if not 200 <= r.status_code <= 299:
             logging.error(f'Got response status {r.status_code}')
             return False
         return True

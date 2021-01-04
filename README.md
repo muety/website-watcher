@@ -87,6 +87,13 @@ First, you have to register a new app in Gotify and gets its key as an authoriza
   --gotify_url GOTIFY_URL       – Gotify server instance address
 ```
 
+### WebSub (`websub`)
+This adapter will send a ping to a [WebSub Hub](https://w3c.github.io/websub) (e.g. [pubsubhubbub.superfeedr.com](http://pubsubhubbub.superfeedr.com/) as a hosted service or [Switchboard](https://switchboard.p3k.io/) as a self-hosted hub). However, a check whether the target resource is actually a publisher for that hub is skipped. You should verify that yourself.
+
+#### Options
+```
+  --hub_url HUB_URL       – URL of the WebSub hub to publish to
+```
 
 ## 👩‍💻 Contributing
 Feel free to contribute! All contributions that add value to the project are welcome. Please check the issues section for bug reports and feature requests.

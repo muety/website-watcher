@@ -65,7 +65,7 @@ def main(args, remaining_args):
 
     diff = abs(len2 - len1)
     if diff > args.tolerance:
-        ok = adapter.send('Difference is %s characters.\n%s' % (str(diff), args.url))
+        ok = adapter.send('Difference is %s characters.\n%s' % (str(diff), args.url), args.url)
         if not ok:
             sys.exit(1)
 
