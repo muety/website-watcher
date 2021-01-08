@@ -83,8 +83,8 @@ First, you have to register a new app in Gotify and gets its key as an authoriza
 
 #### Options
 ```
-  --gotify_key GOTIFY_KEY       – Gotify app key / token
-  --gotify_url GOTIFY_URL       – Gotify server instance address
+  --gotify_key GOTIFY_KEY       – Gotify app key / token (required)
+  --gotify_url GOTIFY_URL       – Gotify server instance address (required)
 ```
 
 ### WebSub (`websub`)
@@ -92,11 +92,11 @@ This adapter will send a ping to a [WebSub Hub](https://w3c.github.io/websub) (e
 
 #### Options
 ```
-  --hub_url HUB_URL       – URL of the WebSub hub to publish to
+  --hub_url HUB_URL             – URL of the WebSub hub to publish to (required)
 ```
 
 ### Sub Process (`subprocess`)
-This adapter allows to execcute arbitrary shell commands with the watch result included as environment variables (`WATCHER_URL` and `WATCHER_DIFF`).
+This adapter allows executing arbitrary shell commands with the watch result included as environment variables (`WATCHER_URL` and `WATCHER_DIFF`).
 
 #### Example
 ```bash
@@ -108,7 +108,15 @@ python watcher.py \
 
 #### Options
 ```
-  --cmd CMD       – A shell command to execute in case of a change
+  --cmd CMD                     – A shell command to execute in case of a change (required)
+```
+
+### Stdout / Log (`stdout`)
+This adapter simply prints a message (either as plain text or in JSON) to the console.
+
+#### Options
+```
+  --log_format LOG_FORMAT       – Format of the logged message (default: 'plain')
 ```
 
 
