@@ -4,6 +4,7 @@ import os
 
 import requests
 
+from model import WatchResult
 from . import SendAdapter
 
 
@@ -11,7 +12,7 @@ class GotifySendAdapter(SendAdapter):
     def __init__(self, args):
         self.args = self._parse_args(args)
 
-    def send(self, data):
+    def send(self, data: WatchResult) -> bool:
         url = f'{self.args.gotify_url}/message'
         r = requests.post(
             url,
@@ -30,7 +31,7 @@ class GotifySendAdapter(SendAdapter):
         return True
 
     @classmethod
-    def get_parser(cls):
+    def get_parser(cls) -> argparse.ArgumentParser:
         parser = argparse.ArgumentParser(prog=f'Website Watcher – "{cls.get_name()}" Adapter',
                                          description=cls.get_description())
         parser.add_argument('--gotify_key', required=True, type=str, help='Gotify app key / token')
@@ -38,11 +39,11 @@ class GotifySendAdapter(SendAdapter):
         return parser
 
     @classmethod
-    def get_name(cls):
+    def get_name(cls) -> str:
         return os.path.basename(__file__)[:-3]
 
     @classmethod
-    def get_description(cls):
+    def get_description(cls) -> str:
         return 'An adapter to send push messages via Gotify (https://gotify.net).'
 
 

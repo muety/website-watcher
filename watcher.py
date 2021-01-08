@@ -18,7 +18,7 @@ def get_nodes(exp, page):
     return tree.xpath(exp)
 
 
-def filter_document(nodes):
+def filter_document(nodes) -> str:
     """ Returns the text content of the specified nodes """
     text = ""
     for element in nodes:
@@ -26,7 +26,7 @@ def filter_document(nodes):
     return text
 
 
-def get_tmp_file(url):
+def get_tmp_file(url: str) -> str:
     tmp_dir = tempfile.gettempdir()
     m = hashlib.md5()
     m.update(url.encode('utf-8'))

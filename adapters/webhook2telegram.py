@@ -5,15 +5,17 @@ import re
 
 import requests
 
+from model import WatchResult
 from . import SendAdapter
 
 TOKEN_REGEX = re.compile(r'[\d\w]{8}-[\d\w]{4}-[\d\w]{4}-[\d\w]{4}-[\d\w]{12}')
+
 
 class Webhook2TelegramSendAdapter(SendAdapter):
     def __init__(self, args):
         self.args = self._parse_args(args)
 
-    def send(self, data):
+    def send(self, data: WatchResult) -> bool:
         url = f'{self.args.webhook_url}/api/messages'
         r = requests.post(url, json={
             'recipient_token': self.args.recipient_token,
@@ -26,23 +28,25 @@ class Webhook2TelegramSendAdapter(SendAdapter):
         return True
 
     @classmethod
-    def get_parser(cls):
-        parser = argparse.ArgumentParser(prog=f'Website Watcher – "{cls.get_name()}" Adapter', description=cls.get_description())
+    def get_parser(cls) -> argparse.ArgumentParser:
+        parser = argparse.ArgumentParser(prog=f'Website Watcher – "{cls.get_name()}" Adapter',
+                                         description=cls.get_description())
         parser.add_argument('-r', '--recipient_token', required=True, type=cls._valid_token, help='Recipient token')
         parser.add_argument('-s', '--sender', default='Website Watcher Script', type=str, help='Sender name')
-        parser.add_argument('--webhook_url', default='https://apps.muetsch.io/webhook2telegram', type=cls._valid_url, help='URL of Webhook2Telegram bot instance')
+        parser.add_argument('--webhook_url', default='https://apps.muetsch.io/webhook2telegram', type=cls._valid_url,
+                            help='URL of Webhook2Telegram bot instance')
         return parser
 
     @classmethod
-    def get_name(cls):
+    def get_name(cls) -> str:
         return os.path.basename(__file__)[:-3]
 
     @classmethod
-    def get_description(cls):
+    def get_description(cls) -> str:
         return 'An adapter to send push messages via Telegram using Webhook2Telegram (https://github.com/muety/webhook2telegram).'
 
     @staticmethod
-    def _valid_token(string):
+    def _valid_token(string: str) -> str:
         match = TOKEN_REGEX.fullmatch(string)
         if not match:
             raise argparse.ArgumentTypeError('not a valid token')

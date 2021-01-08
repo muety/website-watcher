@@ -3,6 +3,7 @@ import json
 import os
 from enum import Enum
 
+from model import WatchResult
 from . import SendAdapter
 
 
@@ -15,7 +16,7 @@ class LogFormat(Enum):
         return self.name
 
     @staticmethod
-    def from_string(s):
+    def from_string(s: str) -> 'LogFormat':
         try:
             return LogFormat[s.upper()]
         except KeyError:
@@ -26,18 +27,17 @@ class StdOutSendAdapter(SendAdapter):
     def __init__(self, args):
         self.args = self._parse_args(args)
 
-    def send(self, data):
+    def send(self, data: WatchResult) -> bool:
         if self.args.log_format is LogFormat.PLAIN:
             print(f'Change of {data.diff} characters detected at {data.url}')
             return True
         if self.args.log_format is LogFormat.JSON:
             print(json.dumps(data.__dict__))
             return True
-
         return False
 
     @classmethod
-    def get_parser(cls):
+    def get_parser(cls) -> argparse.ArgumentParser:
         parser = argparse.ArgumentParser(prog=f'Website Watcher – "{cls.get_name()}" Adapter',
                                          description=cls.get_description())
         parser.add_argument('--log_format', required=False, default='plain', type=LogFormat.from_string,
@@ -46,11 +46,11 @@ class StdOutSendAdapter(SendAdapter):
         return parser
 
     @classmethod
-    def get_name(cls):
+    def get_name(cls) -> str:
         return os.path.basename(__file__)[:-3]
 
     @classmethod
-    def get_description(cls):
+    def get_description(cls) -> str:
         return 'An adapter simply print changes to stdout. Useful when used in combination with systemd, Docker, etc.'
 
 

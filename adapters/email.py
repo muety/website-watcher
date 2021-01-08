@@ -4,6 +4,7 @@ import os
 import re
 import smtplib
 
+from model import WatchResult
 from . import SendAdapter
 
 EMAIL_REGEX = re.compile(r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)')
@@ -13,7 +14,7 @@ class EmailSendAdapter(SendAdapter):
     def __init__(self, args):
         self.args = self._parse_args(args)
 
-    def send(self, data):
+    def send(self, data: WatchResult) -> bool:
         msg = 'From: %s\n' % self.args.sender_address
         msg += 'To: %s\n' % self.args.recipient_address
         msg += 'Subject: %s\n\n' % self.args.subject
@@ -44,30 +45,38 @@ class EmailSendAdapter(SendAdapter):
                 return False
 
     @classmethod
-    def get_parser(cls):
-        parser = argparse.ArgumentParser(prog=f'Website Watcher – "{cls.get_name()}" Adapter', description=cls.get_description())
-        parser.add_argument('-r', '--recipient_address', required=True, type=cls._valid_email, help='Receiver e-mail address')
-        parser.add_argument('-s', '--sender_address', default='noreply@example.com', type=cls._valid_email, help='Sender e-mail address')
+    def get_parser(cls) -> argparse.ArgumentParser:
+        parser = argparse.ArgumentParser(prog=f'Website Watcher – "{cls.get_name()}" Adapter',
+                                         description=cls.get_description())
+        parser.add_argument('-r', '--recipient_address', required=True, type=cls._valid_email,
+                            help='Receiver e-mail address')
+        parser.add_argument('-s', '--sender_address', default='noreply@example.com', type=cls._valid_email,
+                            help='Sender e-mail address')
         parser.add_argument('--subject', default='Something has changed', type=str, help='E-Mail subject')
         parser.add_argument('--sendmail_path', default='/usr/sbin/sendmail', type=str, help='Path to Sendmail binary')
         parser.add_argument('--smtp', action='store_true', help='If set, SMTP is used instead of local Sendmail.')
-        parser.add_argument('--smtp_host', default='localhost', type=str, help='SMTP server host name to send mails with – only required of "--smtp" is set to true')
-        parser.add_argument('--smtp_port', default=25, type=int, help='SMTP server port – only required of "--smtp" is set to true')
-        parser.add_argument('--smtp_username', default='', type=str, help='SMTP server login username – only required of "--smtp" is set to true')
-        parser.add_argument('--smtp_password', default='', type=str, help='SMTP server login password – only required of "--smtp" is set to true')
-        parser.add_argument('--disable_tls', action='store_true', help='If set, SMTP connection is unencrypted (TLS disabled) – only required of "--smtp" is set to true')
+        parser.add_argument('--smtp_host', default='localhost', type=str,
+                            help='SMTP server host name to send mails with – only required of "--smtp" is set to true')
+        parser.add_argument('--smtp_port', default=25, type=int,
+                            help='SMTP server port – only required of "--smtp" is set to true')
+        parser.add_argument('--smtp_username', default='', type=str,
+                            help='SMTP server login username – only required of "--smtp" is set to true')
+        parser.add_argument('--smtp_password', default='', type=str,
+                            help='SMTP server login password – only required of "--smtp" is set to true')
+        parser.add_argument('--disable_tls', action='store_true',
+                            help='If set, SMTP connection is unencrypted (TLS disabled) – only required of "--smtp" is set to true')
         return parser
 
     @classmethod
-    def get_name(cls):
+    def get_name(cls) -> str:
         return os.path.basename(__file__)[:-3]
 
     @classmethod
-    def get_description(cls):
+    def get_description(cls) -> str:
         return 'An adapter to send e-mail notifications using local sendmail or an SMTP server.'
 
     @staticmethod
-    def _valid_email(string):
+    def _valid_email(string: str) -> str:
         match = EMAIL_REGEX.fullmatch(string)
         if not match:
             raise argparse.ArgumentTypeError('not a valid e-mail')
