@@ -22,7 +22,7 @@ The script is very simple and works in a way that it visits a website, saves the
 In order to save memory and CPU time in idle (although only very few) the script itself will only run once when executing it and instantly exit after it has finished one website visit. To make it run repeatedly you will have to set up a cron job that simply execute the script.
 
 ## ⚙️ Requirements
-* Python >= 3.6
+* Python >= 3.7
   * Currently not working with Python 3.9
 * Cron jobs
   * Or something like [schtasks](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc748993(v=ws.11)?redirectedfrom=MSDN) on Windows
@@ -94,6 +94,23 @@ This adapter will send a ping to a [WebSub Hub](https://w3c.github.io/websub) (e
 ```
   --hub_url HUB_URL       – URL of the WebSub hub to publish to
 ```
+
+### Sub Process (`subprocess`)
+This adapter allows to execcute arbitrary shell commands with the watch result included as environment variables (`WATCHER_URL` and `WATCHER_DIFF`).
+
+#### Example
+```bash
+python watcher.py \
+  -u https://kit.edu \
+  --adapter subprocess \
+  --cmd "echo $WATCHER_DIFF characters changed at $WATCHER_URL > /tmp/watcher.txt"
+```
+
+#### Options
+```
+  --cmd CMD       – A shell command to execute in case of a change
+```
+
 
 ## 👩‍💻 Contributing
 Feel free to contribute! All contributions that add value to the project are welcome. Please check the issues section for bug reports and feature requests.

@@ -9,7 +9,7 @@ import requests
 from lxml import html
 
 from adapters import SendAdapterFactory
-
+from model import WatchResult
 
 def get_nodes(exp, page):
     """ Returns lxml nodes corresponding to the XPath expression """
@@ -65,7 +65,7 @@ def main(args, remaining_args):
 
     diff = abs(len2 - len1)
     if diff > args.tolerance:
-        ok = adapter.send('Difference is %s characters.\n%s' % (str(diff), args.url), args.url)
+        ok = adapter.send(WatchResult(args.url, diff))
         if not ok:
             sys.exit(1)
 

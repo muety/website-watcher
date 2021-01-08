@@ -8,16 +8,18 @@ import requests
 from . import SendAdapter
 
 TOKEN_REGEX = re.compile(r'[\d\w]{8}-[\d\w]{4}-[\d\w]{4}-[\d\w]{4}-[\d\w]{12}')
-URL_REGEX = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
-
 
 class Webhook2TelegramSendAdapter(SendAdapter):
     def __init__(self, args):
         self.args = self._parse_args(args)
 
-    def send(self, text, subject_url):
+    def send(self, data):
         url = f'{self.args.webhook_url}/api/messages'
-        r = requests.post(url, json={'recipient_token': self.args.recipient_token, 'origin': self.args.sender, 'text': text})
+        r = requests.post(url, json={
+            'recipient_token': self.args.recipient_token,
+            'origin': self.args.sender,
+            'text': f'Difference is {data.diff} characters\n{data.url}'
+        })
         if not 200 <= r.status_code <= 299:
             logging.error(f'Got response status {r.status_code}')
             return False
@@ -44,13 +46,6 @@ class Webhook2TelegramSendAdapter(SendAdapter):
         match = TOKEN_REGEX.fullmatch(string)
         if not match:
             raise argparse.ArgumentTypeError('not a valid token')
-        return match.string
-
-    @staticmethod
-    def _valid_url(string):
-        match = URL_REGEX.fullmatch(string)
-        if not match:
-            raise argparse.ArgumentTypeError('not a valid url')
         return match.string
 
 

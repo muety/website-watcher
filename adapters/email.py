@@ -13,11 +13,11 @@ class EmailSendAdapter(SendAdapter):
     def __init__(self, args):
         self.args = self._parse_args(args)
 
-    def send(self, text, subject_url):
+    def send(self, data):
         msg = 'From: %s\n' % self.args.sender_address
         msg += 'To: %s\n' % self.args.recipient_address
         msg += 'Subject: %s\n\n' % self.args.subject
-        msg += text
+        msg += f'Difference is {data.diff} characters\n{data.url}'
 
         if not self.args.smtp:
             sendmail_location = self.args.sendmail_path

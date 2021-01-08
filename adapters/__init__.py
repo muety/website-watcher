@@ -2,6 +2,9 @@ import importlib
 import logging
 from abc import ABC, abstractmethod
 
+from model import WatchResult
+from utils.url import parse_url
+
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
 
@@ -30,7 +33,7 @@ class SendAdapter(ABC):
             raise e
 
     @abstractmethod
-    def send(self, text, subject_url):
+    def send(self, data):
         pass
 
     @classmethod
@@ -47,3 +50,10 @@ class SendAdapter(ABC):
     @abstractmethod
     def get_description(cls):
         pass
+
+    @staticmethod
+    def _valid_url(string):
+        url = parse_url(string)
+        if url is None:
+            raise argparse.ArgumentTypeError('not a valid url')
+        return url
