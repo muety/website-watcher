@@ -11,6 +11,7 @@ from lxml import html
 from adapters import SendAdapterFactory
 from model import WatchResult
 
+
 def get_nodes(exp, page):
     """ Returns lxml nodes corresponding to the XPath expression """
     tree = html.fromstring(page)

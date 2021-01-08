@@ -2,7 +2,6 @@ import importlib
 import logging
 from abc import ABC, abstractmethod
 
-from model import WatchResult
 from utils.url import parse_url
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
