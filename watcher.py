@@ -48,18 +48,21 @@ def main(args, remaining_args):
     except:
         len1 = 0
 
+    if args.user_agent.lower() == 'firefox':
+        args.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0' # Firefox 84 on Windows 10
+
     # Read length of current web page version
     # 301 and 302 redirections are resolved automatically
-    r = requests.get(args.url)
-    if r.status_code != 200:
+    r = requests.get(args.url, headers = { 'user-agent': args.user_agent })
+    if 200 <= r.status_code <= 299 :
+        len2 = len(filter_document(get_nodes(args.xpath, r.text.encode("utf-8"))))
+    else:
         print('Could not fetch %s.' % args.url)
         len2 = 0
-    else:
-        len2 = len(filter_document(get_nodes(args.xpath, r.text.encode("utf-8"))))
 
     # Write new version to file
     try:
-        with open(tmp_location, 'w') as f:
+        with open(tmp_location, 'w', encoding='utf-8') as f:
             f.write(r.text)
     except Exception as e:
         print('Could not open file %s: %s' % (tmp_location, e))
@@ -84,6 +87,7 @@ if __name__ == '__main__':
     parser.add_argument('-u', '--url', required=True, type=str, help='URL to watch')
     parser.add_argument('-t', '--tolerance', default=0, type=int, help='Number of characters which have to differ between cached- and new content to trigger a notification')
     parser.add_argument('-x', '--xpath', default='//body', type=str, help="XPath expression designating the elements to watch")
+    parser.add_argument('-ua', '--user-agent', default='muety/website-watcher', type=str, help='User agent header to include in requests (available shortcuts: "firefox")')
     parser.add_argument('--adapter', default='email', type=str, help='Send method to use. See "adapters" for all available')
 
     args, remaining_args = parser.parse_known_args()
