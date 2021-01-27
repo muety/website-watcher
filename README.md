@@ -38,6 +38,7 @@ In order to save memory and CPU time in idle (although only very few) the script
 * `-u URL` (`required`): URL of the website to watch
 * `-t TOLERANCE`: Tolerance in characters, i.e. changes with a difference of less than or equal to `TOLERANCE` characters will be ignored and not trigger a notification
 * `-x XPATH`: An [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) query to restrict watching to certain parts of a website. Only child elements of the element matching the query will be considered while watching
+* `-ua USER_AGENT`: A custom user agent header to set in requests, e.g. for pretending to be a browser. Shortcut `firefox` is available to fake a Firefox 84 on Windows 10
 * `--adapter ADAPTER`: Which sending adapter to use (see below)
 
 ### 👀 Please note
@@ -119,9 +120,17 @@ This adapter simply prints a message (either as plain text or in JSON) to the co
   --log_format LOG_FORMAT       – Format of the logged message (default: 'plain')
 ```
 
+## 🧩 Website Examples
+### Watching [ebay-kleinanzeigen.de](https://ebay-kleinanzeigen.de)
+1. Go to the front page
+1. Use F12 to open your browser's dev tools and switch to the _Network_ tab
+1. Enter your search query, location and radius and git _Search_
+1. Right-click the first request of type _html_ and status code _301_ and copy its URL (starts with `https://www.ebay-kleinanzeigen.de/s-suchanfrage.html`)
+1. Watch it: `python3 watcher.py -u "<URL_FROM_STEP_4>" -ua firefox -x "//div[@id='srchrslt-content']" --adapter stdout`
 
 ## 👩‍💻 Contributing
 Feel free to contribute! All contributions that add value to the project are welcome. Please check the issues section for bug reports and feature requests.
 
 ## 📓 License
 MIT @ [Ferdinand Mütsch](https://muetsch.io)
+l-container-row 
