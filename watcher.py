@@ -4,6 +4,7 @@ import hashlib
 import os
 import sys
 import tempfile
+import difflib 
 
 import requests
 from lxml import html
@@ -33,8 +34,15 @@ def get_tmp_file(url: str) -> str:
     return os.path.join(tmp_dir, f'{m.hexdigest()[:6]}_cache.txt')
 
 
+def diff_chars(a, b):
+    d = difflib.unified_diff(a, b)
+    return sum([i >= 2 and len(l) > 0 and l[0] in ['+', '-'] for i, l in enumerate(d)])
+
+
 def main(args, remaining_args):
     tmp_location = get_tmp_file(args.url)
+
+    doc1, doc2 = '', ''
 
     try:
         adapter = SendAdapterFactory.get(args.adapter, remaining_args)
@@ -44,9 +52,9 @@ def main(args, remaining_args):
     # Read length of old web page version
     try:
         with open(tmp_location, 'r') as f:
-            len1 = len(filter_document(get_nodes(args.xpath, f.read().encode("utf-8"))))
+            doc1 = filter_document(get_nodes(args.xpath, f.read().encode("utf-8")))
     except:
-        len1 = 0
+        pass
 
     if args.user_agent.lower() == 'firefox':
         args.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0' # Firefox 84 on Windows 10
@@ -55,10 +63,9 @@ def main(args, remaining_args):
     # 301 and 302 redirections are resolved automatically
     r = requests.get(args.url, headers = { 'user-agent': args.user_agent })
     if 200 <= r.status_code <= 299 :
-        len2 = len(filter_document(get_nodes(args.xpath, r.text.encode("utf-8"))))
+        doc2 = filter_document(get_nodes(args.xpath, r.text.encode("utf-8")))
     else:
         print('Could not fetch %s.' % args.url)
-        len2 = 0
 
     # Write new version to file
     try:
@@ -67,7 +74,7 @@ def main(args, remaining_args):
     except Exception as e:
         print('Could not open file %s: %s' % (tmp_location, e))
 
-    diff = abs(len2 - len1)
+    diff = diff_chars(doc1, doc2)
     if diff > args.tolerance:
         ok = adapter.send(WatchResult(args.url, diff))
         if not ok:
