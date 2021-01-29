@@ -23,7 +23,6 @@ In order to save memory and CPU time in idle (although only very few) the script
 
 ## ⚙️ Requirements
 * Python >= 3.7
-  * Currently not working with Python 3.9
 * Cron jobs
   * Or something like [schtasks](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc748993(v=ws.11)?redirectedfrom=MSDN) on Windows
 
@@ -33,6 +32,7 @@ In order to save memory and CPU time in idle (although only very few) the script
 * `chmod +x watcher.py`
 * Create cronjob for your user account with `crontab -e` and add – for instance – `@hourly ~/dev/watcher.py -u https://kit.edu -t 5 --adapter email -r ferdinand@muetsch.io`. This will hourly visit kit.edu and send an e-mail in case of changes, while ignoring changes less than 6 characters.
 * See `python3 watcher.py -h` for information on all available parameters.
+* 👉 **New:** See [batch.sh](batch.sh) for information on how to watch multiple websites at once
 
 ### Options
 * `-u URL` (`required`): URL of the website to watch

@@ -34,7 +34,7 @@ def get_tmp_file(url: str) -> str:
     return os.path.join(tmp_dir, f'{m.hexdigest()[:6]}_cache.txt')
 
 
-def diff_chars(a, b):
+def diff_chars(a: str, b: str) -> int:
     d = difflib.unified_diff(a, b)
     return sum([i >= 2 and len(l) > 0 and l[0] in ['+', '-'] for i, l in enumerate(d)])
 

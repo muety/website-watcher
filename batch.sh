@@ -12,9 +12,9 @@
 #   - Debian / Ubuntu: apt install jq
 #   - Fedora / RHEL: dnf install jq
 # - watcher.py must be executable
-#   - chmod x watcher.py
+#   - chmod +x watcher.py
 # - batch.sh must be executable
-#   - chmod x batch.sh
+#   - chmod +x batch.sh
 #
 # Example Usage:
 # --------------
