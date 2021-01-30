@@ -51,8 +51,8 @@ def main(args, remaining_args):
 
     # Read length of old web page version
     try:
-        with open(tmp_location, 'r') as f:
-            doc1 = filter_document(get_nodes(args.xpath, f.read().encode("utf-8")))
+        with open(tmp_location, 'r', encoding='utf8', newline='') as f:
+            doc1 = filter_document(get_nodes(args.xpath, f.read()))
     except:
         pass
 
@@ -69,7 +69,7 @@ def main(args, remaining_args):
 
     # Write new version to file
     try:
-        with open(tmp_location, 'w', encoding='utf-8') as f:
+        with open(tmp_location, 'w', encoding='utf-8', newline='') as f:
             f.write(r.text)
     except Exception as e:
         print('Could not open file %s: %s' % (tmp_location, e))
