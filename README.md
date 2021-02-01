@@ -128,7 +128,13 @@ This adapter simply prints a message (either as plain text or in JSON) to the co
 1. Right-click the first request of type _html_ and status code _301_ and copy its URL (starts with `https://www.ebay-kleinanzeigen.de/s-suchanfrage.html`)
 1. Watch it: `python3 watcher.py -u "<URL_FROM_STEP_4>" -ua firefox -x "//div[@id='srchrslt-content']" --adapter stdout`
 
-## 👩‍💻 Contributing
+## 🧑‍💻 Developer Notes
+### Tests
+```bash
+$ python3 -m unittest discover . '*_test.py'
+```
+
+## ↗️ Contributing
 Feel free to contribute! All contributions that add value to the project are welcome. Please check the issues section for bug reports and feature requests.
 
 ## 📓 License
