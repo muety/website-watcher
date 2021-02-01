@@ -63,7 +63,7 @@ def main(args, remaining_args):
     # 301 and 302 redirections are resolved automatically
     r = requests.get(args.url, headers = { 'user-agent': args.user_agent })
     if 200 <= r.status_code <= 299 :
-        doc2 = filter_document(get_nodes(args.xpath, r.text.encode("utf-8")))
+        doc2 = filter_document(get_nodes(args.xpath, r.text))
     else:
         print('Could not fetch %s.' % args.url)
 
