@@ -45,8 +45,8 @@ for job in $jobs; do
         exit 1
     fi
 
-    if [ "$xpath" == "null" ]; then
-        echo "Error: XPATH missing for job $cur of $total (just set it to '/' to watch whole document)"
+    if [ "$ignore" == "null" ]; then
+        echo "Error: XPATH ignore list missing for job $cur of $total (separate XPATH expressions by a space)"
         exit 1
     fi
 
