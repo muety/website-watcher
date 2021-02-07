@@ -38,6 +38,7 @@ In order to save memory and CPU time in idle (although only very few) the script
 * `-u URL` (`required`): URL of the website to watch
 * `-t TOLERANCE`: Tolerance in characters, i.e. changes with a difference of less than or equal to `TOLERANCE` characters will be ignored and not trigger a notification
 * `-x XPATH`: An [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) query to restrict watching to certain parts of a website. Only child elements of the element matching the query will be considered while watching
+* `-i XPATH_IGNORE`: A list of [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) queries to exclude certain parts of a website. Multiple queries possible by separating with a space like -i "//script" "//style". 
 * `-ua USER_AGENT`: A custom user agent header to set in requests, e.g. for pretending to be a browser. Shortcut `firefox` is available to fake a Firefox 84 on Windows 10
 * `--adapter ADAPTER`: Which sending adapter to use (see below)
 
