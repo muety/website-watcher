@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # ---------------------------------------------------
@@ -8,9 +7,9 @@
 #
 # Prerequisites:
 # --------------
-# - jq must be installed
-#   - Debian / Ubuntu: apt install jq
-#   - Fedora / RHEL: dnf install jq
+# - jq and bc must be installed
+#   - Debian / Ubuntu: apt install jq bc
+#   - Fedora / RHEL: dnf install jq bc
 # - watcher.py must be executable
 #   - chmod +x watcher.py
 # - batch.sh must be executable
@@ -29,6 +28,7 @@ for job in $jobs; do
     url=$(echo $job | jq -r '.url')
     tolerance=$(echo $job | jq -r '.tolerance')
     xpath=$(echo $job | jq -r '.xpath')
+    ignore=$(echo $job | jq -r '.ignore' | tr \; " ")
 
     if [ "$url" == "null" ]; then
         echo "Error: URL parameter missing for job $cur of $total"
@@ -45,10 +45,15 @@ for job in $jobs; do
         exit 1
     fi
 
+    if [ "$xpath" == "null" ]; then
+        echo "Error: XPATH missing for job $cur of $total (just set it to '/' to watch whole document)"
+        exit 1
+    fi
+
     echo "[$cur/$total] Watching $url."
-    
+
     start=`date +%s.%N`
-    ./watcher.py -u $url -t $tolerance -x $xpath ${@:2}
+    ./watcher.py -u $url -t $tolerance -x $xpath -i $ignore "${@:2}"
     end=`date +%s.%N`
 
     echo "[$cur/$total] Took $(echo $end-$start | bc) seconds."
