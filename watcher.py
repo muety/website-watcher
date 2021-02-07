@@ -16,6 +16,9 @@ from model import WatchResult
 def get_nodes(exp, page):
     """ Returns lxml nodes corresponding to the XPath expression """
     tree = html.fromstring(page)
+    for i in ignore:
+        for j in tree.xpath(i):
+            j.drop_tree()
     return tree.xpath(exp)
 
 
@@ -94,6 +97,7 @@ if __name__ == '__main__':
     parser.add_argument('-u', '--url', required=True, type=str, help='URL to watch')
     parser.add_argument('-t', '--tolerance', default=0, type=int, help='Number of characters which have to differ between cached- and new content to trigger a notification')
     parser.add_argument('-x', '--xpath', default='//body', type=str, help="XPath expression designating the elements to watch")
+    parser.add_argument('-i', '--ignore', nargs='+', default='', type=str, help="One or multiple XPath expressions designating the elements to ignore")
     parser.add_argument('-ua', '--user-agent', default='muety/website-watcher', type=str, help='User agent header to include in requests (available shortcuts: "firefox")')
     parser.add_argument('--adapter', default='email', type=str, help='Send method to use. See "adapters" for all available')
 
