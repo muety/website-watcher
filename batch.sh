@@ -20,11 +20,12 @@
 # ./batch.sh example/many.json --adapter stdout
 # ---------------------------------------------------
 
-jobs=$(cat $1 | jq -c '.[]')
+jobs="$(cat $1 | jq -c '.[]')"
 total=$(jq length $1)
 cur=1
 
-for job in $jobs; do
+# https://unix.stackexchange.com/a/9789
+while IFS= read -r job; do
     url=$(echo $job | jq -r '.url')
     tolerance=$(echo $job | jq -r '.tolerance')
     xpath=$(echo $job | jq -r '.xpath')
@@ -53,11 +54,12 @@ for job in $jobs; do
     echo "[$cur/$total] Watching $url."
 
     start=`date +%s.%N`
-    ./watcher.py -u $url -t $tolerance -x $xpath -i $ignore "${@:2}"
+    ./watcher.py -u "$url" -t "$tolerance" -x "$xpath" -i "$ignore" "${@:2}"
     end=`date +%s.%N`
 
     echo "[$cur/$total] Took $(echo $end-$start | bc) seconds."
     echo ""
 
     cur=$((cur+1))
-done
+done < <(printf '%s\n' "$jobs")
+
