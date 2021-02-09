@@ -54,7 +54,7 @@ while IFS= read -r job; do
     echo "[$cur/$total] Watching $url."
 
     start=`date +%s.%N`
-    ./watcher.py -u "$url" -t "$tolerance" -x "$xpath" -i "$ignore" "${@:2}"
+    ./watcher.py -u "$url" -t "$tolerance" -x "$xpath" -i $ignore ${@:2}
     end=`date +%s.%N`
 
     echo "[$cur/$total] Took $(echo $end-$start | bc) seconds."
