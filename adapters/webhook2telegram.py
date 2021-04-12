@@ -20,7 +20,7 @@ class Webhook2TelegramSendAdapter(SendAdapter):
         r = requests.post(url, json={
             'recipient_token': self.args.recipient_token,
             'origin': self.args.sender,
-            'text': f'Difference is {data.diff} characters\n{data.url}'
+            'text': f'Difference is {data.diff} characters\n[{data.url}]({data.url})'
         })
         if not 200 <= r.status_code <= 299:
             logging.error(f'Got response status {r.status_code}')
