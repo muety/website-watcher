@@ -68,15 +68,15 @@ This adapter, which is also the default one, will send an e-mail to notify about
 
 ```
 
-### Webhook2Telegram (`webhook2telegram`)
-This adapter will send an push notification via [Telegram](https://telegram.org) using [Webhook2Telegram](https://github.com/muety/webhook2telegram).
-You have to register for the bot first to get an token. To do so, send a message to [@MiddlemanBot](https://t.me/@MiddlemanBot) (Webhook2Telegram was formerly called MiddlemanBot).
+### Telepush (`telepush`)
+This adapter will send an push notification via [Telegram](https://telegram.org) using [Telepush](https://github.com/muety/telepush).
+You have to register for the bot first to get an token. To do so, send a message to [TelepushBot](https://t.me/@MiddlemanBot) (Telepush was formerly called MiddlemanBot).
 
 #### Options
 ```
   -r RECIPIENT_TOKEN            – Recipient token (required)
   -s SENDER                     – Sender name
-  --webhook_url WEBHOOK_URL     – URL of the Webhook2Telegram bot instance
+  --webhook_url WEBHOOK_URL     – URL of the Telepush bot instance
 ```
 
 ### Gotify (`gotify`)

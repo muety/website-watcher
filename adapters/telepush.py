@@ -1,24 +1,20 @@
 import argparse
 import logging
 import os
-import re
 
 import requests
 
 from model import WatchResult
 from . import SendAdapter
 
-TOKEN_REGEX = re.compile(r'[\d\w]{8}-[\d\w]{4}-[\d\w]{4}-[\d\w]{4}-[\d\w]{12}')
 
-
-class Webhook2TelegramSendAdapter(SendAdapter):
+class TelepushSendAdapter(SendAdapter):
     def __init__(self, args):
         self.args = self._parse_args(args)
 
     def send(self, data: WatchResult) -> bool:
-        url = f'{self.args.webhook_url}/api/messages'
+        url = f'{self.args.webhook_url}/api/messages/{self.args.recipient_token}'
         r = requests.post(url, json={
-            'recipient_token': self.args.recipient_token,
             'origin': self.args.sender,
             'text': f'Difference is {data.diff} characters\n[{data.url}]({data.url})'
         })
@@ -31,10 +27,10 @@ class Webhook2TelegramSendAdapter(SendAdapter):
     def get_parser(cls) -> argparse.ArgumentParser:
         parser = argparse.ArgumentParser(prog=f'Website Watcher – "{cls.get_name()}" Adapter',
                                          description=cls.get_description())
-        parser.add_argument('-r', '--recipient_token', required=True, type=cls._valid_token, help='Recipient token')
+        parser.add_argument('-r', '--recipient_token', required=True, type=str, help='Recipient token')
         parser.add_argument('-s', '--sender', default='Website Watcher Script', type=str, help='Sender name')
-        parser.add_argument('--webhook_url', default='https://apps.muetsch.io/webhook2telegram', type=cls._valid_url,
-                            help='URL of Webhook2Telegram bot instance')
+        parser.add_argument('--webhook_url', default='https://telepush.dev', type=cls._valid_url,
+                            help='URL of Telepush bot instance')
         return parser
 
     @classmethod
@@ -43,14 +39,7 @@ class Webhook2TelegramSendAdapter(SendAdapter):
 
     @classmethod
     def get_description(cls) -> str:
-        return 'An adapter to send push messages via Telegram using Webhook2Telegram (https://github.com/muety/webhook2telegram).'
-
-    @staticmethod
-    def _valid_token(string: str) -> str:
-        match = TOKEN_REGEX.fullmatch(string)
-        if not match:
-            raise argparse.ArgumentTypeError('not a valid token')
-        return match.string
+        return 'An adapter to send push messages via Telegram using Telepush (https://github.com/muety/telepush).'
 
 
-adapter = Webhook2TelegramSendAdapter
+adapter = TelepushSendAdapter
