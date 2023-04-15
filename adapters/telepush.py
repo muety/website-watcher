@@ -16,7 +16,7 @@ class TelepushSendAdapter(SendAdapter):
         url = f'{self.args.webhook_url}/api/messages/{self.args.recipient_token}'
         r = requests.post(url, json={
             'origin': self.args.sender,
-            'text': f'Difference is {data.diff} characters\n[{data.url}]({data.url})'
+            'text': f'Difference is {data.diff} characters.\nCheck [{data.url}]({data.url})'
         })
         if not 200 <= r.status_code <= 299:
             logging.error(f'Got response status {r.status_code}')

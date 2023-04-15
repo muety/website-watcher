@@ -17,8 +17,8 @@ class GotifySendAdapter(SendAdapter):
         r = requests.post(
             url,
             json={
-                'title': 'Something has changed!',
-                'message': f'Difference is {data.diff} characters\n{data.url}',
+                'title': 'Website has changed!',
+                'message': f'Difference is {data.diff} characters.\nCheck {data.url}',
                 'priority': 2
             },
             headers={

@@ -22,7 +22,7 @@ The script is very simple and works in a way that it visits a website, saves the
 In order to save memory and CPU time in idle (although only very few) the script itself will only run once when executing it and instantly exit after it has finished one website visit. To make it run repeatedly you will have to set up a cron job that simply execute the script.
 
 ## ⚙️ Requirements
-* Python >= 3.7
+* Python >= 3.9
 * Cron jobs
   * Or something like [schtasks](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc748993(v=ws.11)?redirectedfrom=MSDN) on Windows
 
@@ -87,6 +87,17 @@ First, you have to register a new app in Gotify and gets its key as an authoriza
 ```
   --gotify_key GOTIFY_KEY       – Gotify app key / token (required)
   --gotify_url GOTIFY_URL       – Gotify server instance address (required)
+```
+
+### Ntfy.sh (`ntfy`)
+This adapter will send an push notification via [ntfy.sh](https://ntfy.sh).
+
+#### Options
+
+```
+  --ntfy_topic NTFY_TOPIC       – Ntfy topic to publish to (required)
+  --ntfy_url NTFY_URL           – Ntfy server instance address (optional)
+  --ntfy_token NTFY_TOKEN       – Ntfy access token (if server required authentication) (optional)
 ```
 
 ### WebSub (`websub`)
