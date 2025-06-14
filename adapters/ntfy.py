@@ -1,4 +1,5 @@
 import argparse
+import json
 import logging
 import os
 
@@ -13,14 +14,18 @@ class NtfySendAdapter(SendAdapter):
         self.args = self._parse_args(args)
 
     def send(self, data: WatchResult) -> bool:
-        headers = { 'Title': 'Website has changed!' }
+        headers = { 'content-type': 'application/json' }
         if self.args.ntfy_token:
             headers['Authorization'] = f'Bearer {self.args.ntfy_token}'
 
         r = requests.post(
-            f'{self.args.ntfy_url}/{self.args.ntfy_topic}',
-            data=f'Difference is {data.diff}. characters\nCheck {data.url}',
-            headers=headers
+            f'{self.args.ntfy_url}',
+            data=json.dumps({
+                'topic': self.args.ntfy_topic,
+                'message': f'Difference is {data.diff} characters. Check {data.url}.',
+                'click': data.url,
+            }),
+            headers=headers,
         )
         if r.status_code != 200:
             logging.error(r.text)
