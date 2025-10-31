@@ -12,7 +12,7 @@
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=muety_website-watcher&metric=ncloc)](https://sonarcloud.io/dashboard?id=muety_website-watcher)
 
 ## 🗒 Summary
-This script watches a website, saves its contents to a specified text file, compares this file's contents to the website contents at the next visit and sends an e-mail if there are differences.
+This script watches a website or JSON endpoint, saves its contents to a specified text file, compares this file's contents to the live contents at the next visit and sends an e-mail if there are differences.
 
 **Please note:** This will only work for **static** websites, which are completely rendered on the server. To parse dynamic, JavaScript-powered websites, like Single Page Apps, you would need a tool like [Selenium WebDriver](https://www.seleniumhq.org/projects/webdriver/). If you're interested, please refer to my blog article about [_"Building a cloud-native web scraper using 8 different AWS services"_](https://muetsch.io/building-a-cloud-native-web-scraper-using-8-different-aws-services.html).
 
@@ -35,11 +35,13 @@ In order to save memory and CPU time in idle (although only very few) the script
 * 👉 **New:** See [batch.sh](batch.sh) for information on how to watch multiple websites at once
 
 ### Options
-* `-u URL` (`required`): URL of the website to watch
+* `-u URL` (`required`): URL of the website or API endpoint to watch
 * `-t TOLERANCE`: Tolerance in characters, i.e. changes with a difference of less than or equal to `TOLERANCE` characters will be ignored and not trigger a notification
-* `-x XPATH`: An [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) query to restrict watching to certain parts of a website. Only child elements of the element matching the query will be considered while watching
-* `-i XPATH_IGNORE`: A list of [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) queries to exclude certain parts of a website. Multiple queries possible by separating with a space like -i "//script" "//style". 
+* `-x XPATH`: An [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) query to restrict watching to certain parts of a website. Only child elements of the element matching the query will be considered while watching. Mutually exclusive with `--jsonpath`.
+* `--jsonpath JSONPATH`: A [JSONPath](https://goessner.net/articles/JsonPath/) query to restrict watching to certain parts of a JSON document (e.g., `$.data.items[*]`). Defaults to `$` to watch the entire document. Mutually exclusive with `-x`.
+* `-i XPATH_IGNORE`: A list of [XPath](https://developer.mozilla.org/en-US/docs/Web/XPath) queries to exclude certain parts of a website. Multiple queries possible by separating with a space like `-i "//script" "//style"`. 
 * `-ua USER_AGENT`: A custom user agent header to set in requests, e.g. for pretending to be a browser. Shortcut `firefox` is available to fake a Firefox 84 on Windows 10
+* `-json`: A boolean flag indicating whether the expected response contains JSON content.
 * `--adapter ADAPTER`: Which sending adapter to use (see below)
 
 ### 👀 Please note

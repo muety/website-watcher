@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import argparse
 import hashlib
+import json
 import os
 import sys
 import tempfile
@@ -8,12 +9,13 @@ import difflib
 
 import requests
 from lxml import html
+from jsonpath_ng import parse as parse_jsonpath
 
 from adapters import SendAdapterFactory
 from model import WatchResult
 
 
-def get_nodes(exp, page, ignore):
+def get_xml_nodes(exp, page, ignore):
     """ Returns lxml nodes corresponding to the XPath expression """
     tree = html.fromstring(page)
     for i in ignore:
@@ -28,6 +30,23 @@ def filter_document(nodes) -> str:
     for element in nodes:
         text = text + element.text_content()
     return text
+
+def get_json_nodes(exp, content):
+    """ Returns text data corresponding to the JSONPath expression """
+    try:
+        parsed_json = json.loads(content)
+        jsonpath_expression = parse_jsonpath(exp)
+        return jsonpath_expression.find(parsed_json)
+    except json.JSONDecodeError as e:
+        print(f'Warning: Invalid JSON content: {e}')
+        return []
+    except Exception as e:
+        print(f"Error processing JSONPath: {e}")
+        return []
+
+def filter_json(nodes) -> str:
+    """ Returns the text content of the specified nodes """
+    return ''.join([str(match.value) for match in nodes])
 
 
 def get_tmp_file(url: str) -> str:
@@ -52,10 +71,23 @@ def main(args, remaining_args):
     except AttributeError:
         sys.exit(1)
 
+    if args.json and args.xpath and args.xpath != '//body':
+        print('Error: --json and --xpath are mutually exclusive')
+        sys.exit(1)
+    if args.jsonpath and args.xpath and args.xpath != '//body':
+        print('Error: --jsonpath and --xpath are mutually exclusive')
+        sys.exit(1)
+
+    args.json = args.json or args.jsonpath
+
     # Read length of old web page version
     try:
         with open(tmp_location, 'r', encoding='utf8', newline='') as f:
-            doc1 = filter_document(get_nodes(args.xpath, f.read(), args.ignore))
+            cached_content = f.read()
+            if args.json:
+                doc1 = filter_json(get_json_nodes(args.jsonpath, cached_content))
+            else:
+                doc1 = filter_document(get_xml_nodes(args.xpath, cached_content, args.ignore))
     except:
         pass
 
@@ -66,7 +98,10 @@ def main(args, remaining_args):
     # 301 and 302 redirections are resolved automatically
     r = requests.get(args.url, headers = { 'user-agent': args.user_agent })
     if 200 <= r.status_code <= 299 :
-        doc2 = filter_document(get_nodes(args.xpath, r.text, args.ignore))
+        if args.json:
+            doc2 = filter_json(get_json_nodes(args.jsonpath, r.text))
+        else:
+            doc2 = filter_document(get_xml_nodes(args.xpath, r.text, args.ignore))
     else:
         print('Could not fetch %s.' % args.url)
 
@@ -94,12 +129,14 @@ if __name__ == '__main__':
             sys.exit(0)
 
     parser = argparse.ArgumentParser(prog='Website Watcher')
-    parser.add_argument('-u', '--url', required=True, type=str, help='URL to watch')
-    parser.add_argument('-t', '--tolerance', default=0, type=int, help='Number of characters which have to differ between cached- and new content to trigger a notification')
-    parser.add_argument('-x', '--xpath', default='//body', type=str, help="XPath expression designating the elements to watch")
-    parser.add_argument('-i', '--ignore', default='', type=str, nargs='+', help="One or multiple XPath expressions designating the elements to ignore")
-    parser.add_argument('-ua', '--user-agent', default='muety/website-watcher', type=str, help='User agent header to include in requests (available shortcuts: "firefox")')
-    parser.add_argument('--adapter', default='email', type=str, help='Send method to use. See "adapters" for all available')
+    parser.add_argument('-u', '--url', required=True, type=str, help='URL to watch.')
+    parser.add_argument('-t', '--tolerance', default=0, type=int, help='Number of characters which have to differ between cached- and new content to trigger a notification.')
+    parser.add_argument('-x', '--xpath', default='//body', type=str, help="XPath expression designating the elements to watch.")
+    parser.add_argument('--jsonpath', type=str, help='JSONPath expression to watch (e.g., "$.data.items[*]"). Mutually exclusive with --xpath.')
+    parser.add_argument('-i', '--ignore', default='', type=str, nargs='+', help="One or multiple XPath expressions designating the elements to ignore.")
+    parser.add_argument('-ua', '--user-agent', default='muety/website-watcher', type=str, help='User agent header to include in requests (available shortcuts: "firefox").')
+    parser.add_argument('--adapter', default='email', type=str, help='Send method to use. See "adapters" for all available.')
+    parser.add_argument('--json', action='store_true', help='Treat endpoint as JSON (mutually exclusive with --xpath).')
 
     args, remaining_args = parser.parse_known_args()
 
